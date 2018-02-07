@@ -1,0 +1,87 @@
+<!--
+// Copyright (c) Microsoft Corporation
+// All rights reserved.
+//
+// MIT License:
+// Permission is hereby granted, free of charge, to any person obtaining
+// a copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to
+// permit persons to whom the Software is furnished to do so, subject to
+// the following conditions:
+//
+// The above copyright notice and this permission notice shall be
+// included in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED ""AS IS"", WITHOUT WARRANTY OF ANY KIND,
+// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+// LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+// OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+// WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+-->
+
+<html>
+
+<head>
+    <title>Simple Symmetra Leaderboard</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.10.1/bootstrap-table.min.css">
+</head>
+
+<body>
+    <h2>
+        Team Leaderboard
+    </h2>
+    <!-- Login button -->
+    <button type="button" class="btn btn-primary" onclick="getTeam()">Get Scores</button>
+    <br>
+    <br>
+    <br>
+    <!-- Results -->
+    <table class="table">
+        <thead>
+            <tr>
+                <th></th>
+                <th scope="col" style="text-align: center">Team</th>
+                <th scope="col" style="text-align: center">Score</th>
+            </tr>
+        </thead>
+        <tbody id="teamLeaderboard" scope="row" style="text-align: center">
+        </tbody>
+    </table>
+
+    <script src="https://code.jquery.com/jquery-3.1.1.js" integrity="sha384-VC7EHu0lDzZyFfmjTPJq+DFyIn8TUGAJbEtpXquazFVr00Q/OOx//RjiZ9yU9+9m" crossorigin="anonymous"></script>
+    <script src="https://statics.teams.microsoft.com/sdk/v1.0/js/MicrosoftTeams.min.js" integrity="sha384-SNENyRfvDvybst1u0LawETYF6L5yMx5Ya1dIqWoG4UDTZ/5UAMB15h37ktdBbyFh" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.10.1/bootstrap-table.min.js"></script>
+
+    <script type="text/javascript">
+        microsoftTeams.initialize();
+
+        function getTeam() {
+            microsoftTeams.getContext((context) => {
+                $("#context").text(JSON.stringify(context));
+                
+                $.post(
+                    "https://msopenhack.azurewebsites.net/api/trivia/leaderboard/team",
+                    context,
+                    (myData, status) => {
+                        let leaderboardData = "";
+                        myData.forEach((teamElement) => {
+                            leaderboardData += "<tr><td> </td><td>" + teamElement.name + "</td><td>" + teamElement.score + "</td></tr>"
+                        });
+
+                        $('#teamLeaderboard').html(leaderboardData);
+                    }
+                );
+            }); 
+        }
+    </script>
+</body>
+
+</html>
