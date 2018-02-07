@@ -50,6 +50,8 @@
                 <div><b>UPN:</b> <span id="profileUpn"/></div>
                 <div><b>Object id:</b> <span id="profileObjectId"/></div>
             </div>
+            <div id="photo"></div>
+
         </p>
 
         <script src="https://code.jquery.com/jquery-3.1.1.js" integrity="sha384-VC7EHu0lDzZyFfmjTPJq+DFyIn8TUGAJbEtpXquazFVr00Q/OOx//RjiZ9yU9+9m" crossorigin="anonymous"></script>
@@ -99,18 +101,19 @@
             // Get the user's profile information from Microsoft Graph
             function getUserProfile(accessToken) {
                 $.ajax({
-                    url: "https://graph.microsoft.com/v1.0/me/",
+                    url: "https://graph.microsoft.com/v1.0/users/d2c4b9e1-fdc3-4599-af88-47d5ece58773/photos/48x48/$value",
+                    xhr: function(){
+                        var xhr = new XMLHttpRequest();
+                        xhr.responseType = 'blob';
+                        return xhr;
+                    },
                     beforeSend: function(request) {
                         request.setRequestHeader("Authorization", "Bearer " + accessToken);
                     },
                     success: function (profile) {
-                        $("#profileDisplayName").text(profile.displayName);
-                        $("#profileJobTitle").text(profile.jobTitle);
-                        $("#profileMail").text(profile.mail);
-                        $("#profileUpn").text(profile.userPrincipalName);
-                        $("#profileObjectId").text(profile.id);
-                        $("#divProfile").css({ display: "" });
-                        $("#divError").css({ display: "none" });
+                        const url = window.URL || window.webkitURL;                      
+                        const blobUrl =  url.createObjectURL(profile)
+                        $('<img src="' + blobUrl + '" />').appendTo('#photo'); 
                     },
                     error: function (xhr, textStatus, errorThrown) {
                         console.log("textStatus: " + textStatus + ", errorThrown:" + errorThrown);

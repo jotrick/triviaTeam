@@ -39,7 +39,7 @@
                     client_id: "{{appId}}",
                     response_type: "id_token token",
                     response_mode: "fragment",
-                    scope: "https://graph.microsoft.com/User.Read openid",
+                    scope: "https://graph.microsoft.com/User.ReadBasic.All openid",
                     redirect_uri: window.location.origin + "/tab-auth/simple-end",
                     nonce: _guid(),
                     state: state,
