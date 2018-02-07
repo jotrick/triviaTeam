@@ -64,6 +64,10 @@ app.get("/tab-auth/silent", (req, res) => { res.render("tab-auth/silent"); });
 app.get("/tab-auth/silent-start", (req, res) => { res.render("tab-auth/silent-start"); });
 app.get("/tab-auth/silent-end", (req, res) => { res.render("tab-auth/silent-end"); });
 
+// Trivia hack challenge
+app.get("/trivia/leaderboard/team", (req, res) => { res.render("trivia/teamLeaderboard"); });
+app.get("/trivia/leaderboard/individual", (req, res) => { res.render("trivia/individualLeaderboard"); });
+
 app.get("/", ManifestCreatorStart.getRequestHandler());
 app.get("/createdManifest", ManifestCreatorEnd.getRequestHandler());
 
