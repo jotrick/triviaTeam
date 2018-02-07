@@ -6,10 +6,9 @@ import { StripBotAtMentions } from "./middleware/StripBotAtMentions";
 // import { SetAADObjectId } from "./middleware/SetAADObjectId";
 import { LoadBotChannelData } from "./middleware/LoadBotChannelData";
 import { Strings } from "./locale/locale";
-import { loadSessionAsync, isMessageFromChannel } from "./utils/DialogUtils";
+import { loadSessionAsync } from "./utils/DialogUtils";
 import * as teams from "botbuilder-teams";
 import { ComposeExtensionHandlers } from "./composeExtension/ComposeExtensionHandlers";
-import { TriviaAPI } from "./apis/TriviaAPI";
 
 // =========================================================
 // Bot Setup
@@ -98,61 +97,7 @@ export class Bot extends builder.UniversalBot {
             if (event.membersAdded && event.membersAdded[0].id && event.membersAdded[0].id.endsWith(config.get("bot.botId"))) {
                 let session = await loadSessionAsync(bot, event);
 
-                // casting to keep away typescript errors
-                let teamsChatConnector = (session.connector as teams.TeamsChatConnector);
-                let msgAddress = (session.message.address as builder.IChatConnectorAddress);
-                let msgServiceUrl = msgAddress.serviceUrl;
-
-                // if a message is from a channel, use the team.id to fetch the roster
-                let currId = null;
-                if (isMessageFromChannel(session.message)) {
-                    currId = session.message.sourceEvent.team.id;
-                } else {
-                    currId = session.message.address.conversation.id;
-                }
-
-                teamsChatConnector.fetchMemberList(
-                    msgServiceUrl,
-                    currId,
-                    teams.TeamsMessage.getTenantId(session.message),
-                    async (err, result) => {
-                        if (!err) {
-                            let api = new TriviaAPI();
-                            let body = {
-                                "teamId": currId,
-                                "members": result,
-                            };
-                            let resp = await api.registerTeam(body);
-                            if (resp.success) {
-                                let buttons = new Array<builder.CardAction>();
-                                let messageBackButton = builder.CardAction.messageBack(session, "", "Get Question")
-                                    .displayText("Give me a question")
-                                    .text("Give me a question");
-                                buttons.push(messageBackButton);
-
-                                let newCard = new builder.HeroCard(session)
-                                    .title("Trivia Game")
-                                    .text("Welcome to the trivia game!")
-                                    .images([
-                                        new builder.CardImage(session)
-                                            .url(config.get("app.baseUri") + "/assets/computer_person.jpg")
-                                            .alt(session.gettext(Strings.img_default)),
-                                    ])
-                                    .buttons(buttons);
-
-                                session.send(new builder.Message(session)
-                                    // .attachmentLayout("list")
-                                    .attachmentLayout("carousel")
-                                    .addAttachment(newCard));
-                            } else {
-                                session.send("Something has gone terribly wrong!");
-                            }
-                        } else {
-                            session.error(err);
-                        }
-                        session.endDialog();
-                    },
-                );
+                session.beginDialog("WelcomeDialogId");
             }
         };
     }
