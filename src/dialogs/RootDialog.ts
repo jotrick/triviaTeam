@@ -40,7 +40,9 @@ import { UpdateTextMsgSetupDialog } from "./examples/teams/UpdateTextMsgSetupDia
 // *************************** END OF EXAMPLES *********************************
 
 // Add imports for dialogs
-import { NewQuestionDialog } from "./examples/basic/NewQuestionDialog";
+import { WelcomeDialog } from "./examples/trivia/WelcomeDialog";
+import { NewQuestionDialog } from "./examples/trivia/NewQuestionDialog";
+import { AnswerQuestionDialog } from "./examples/trivia/AnswerQuestionDialog";
 
 // Main dialog that handles commands
 export class RootDialog extends builder.IntentDialog {
@@ -101,7 +103,9 @@ export class RootDialog extends builder.IntentDialog {
         // *************************** END OF EXAMPLES *********************************
 
         // Add child dialogs
+        new WelcomeDialog(bot);
         new NewQuestionDialog(bot);
+        new AnswerQuestionDialog(bot);
     }
 
     // Handle unrecognized input
