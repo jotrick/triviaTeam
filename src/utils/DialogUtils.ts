@@ -1,6 +1,7 @@
 import * as builder from "botbuilder";
 import * as request from "request";
 import * as urlJoin from "url-join";
+import * as config from "config";
 
 export interface MultiTriggerActionDialogEntry {
     dialogId: string;
@@ -8,12 +9,53 @@ export interface MultiTriggerActionDialogEntry {
     action: builder.IDialogWaterfallStep | builder.IDialogWaterfallStep[];
 }
 
-export function loadSessionAsync (bot: builder.UniversalBot, event: builder.IEvent): Promise<builder.Session> {
-    let address = event.address;
+export function loadSessionAsync (bot: builder.UniversalBot, eventOrConversationId: builder.IEvent|string, serviceUrl?: string, locale?: string): Promise<builder.Session> {
+    let address: builder.IChatConnectorAddress = null;
+    if (typeof(eventOrConversationId) === "string") {
+        // eventOrConversationId is a conversationId
+        // if conversationId is passed in, then need to pass in an optional locale in order to get localization
+        // if conversationId is passed in, then serviceUrl is not optional
+        if (!serviceUrl) {
+            return null;
+        }
+
+        let conversationId = eventOrConversationId;
+        address = {
+            channelId: "msteams",
+            user: {
+                id: config.get("bot.botId"),
+            },
+            conversation: {
+                // isGroup: true,
+                id: conversationId,
+            },
+            // channelData: {
+            //     tenant: {
+            //         id: session.message.sourceEvent.tenant.id,
+            //     },
+            // },
+            bot: {
+                id: config.get("bot.botId"),
+                // The bot's name can be used, but is not necessary
+                // name: session.message.address.bot.name,
+            },
+            serviceUrl: serviceUrl,
+            // useAuth: true,
+        };
+    } else {
+        // eventOrConversationId is a builder.IEvent
+        let event = eventOrConversationId;
+        address = event.address;
+        locale = getLocaleFromEvent(event);
+    }
+
+    if (!address) {
+        return null;
+    }
+
     return new Promise<builder.Session>((resolve, reject) => {
         bot.loadSession(address, (err: any, session: builder.Session) => {
             if (!err) {
-                let locale = getLocaleFromEvent(event);
                 if (locale) {
                     (session as any)._locale = locale;
                     session.localizer.load(locale, (err2) => {
