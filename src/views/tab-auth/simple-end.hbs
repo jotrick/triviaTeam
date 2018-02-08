@@ -35,6 +35,7 @@
             localStorage.removeItem("simple.error");
 
             let hashParams = getHashParameters();
+
             if (hashParams["error"]) {
                 // Authentication/authorization failed
                 localStorage.setItem("simple.error", JSON.stringify(hashParams));
@@ -53,7 +54,7 @@
                         accessToken: hashParams["access_token"],
                         tokenType: hashParams["token_type"],
                         expiresIn: hashParams["expires_in"]
-                    })
+                    });
                 }
             } else {
                 // Unexpected condition: hash does not contain error or access_token parameter
