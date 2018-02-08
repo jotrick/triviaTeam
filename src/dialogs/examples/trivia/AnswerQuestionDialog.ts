@@ -218,6 +218,7 @@ export class AnswerQuestionDialog extends TriggerActionDialog {
             // trigger event to Event Grid
             api.notifyTopic({
                 userName: session.message.user.name,
+                aadObjectId: (session.message.user as any).aadObjectId,
                 newBadge: answerResp.achievementBadge,
             });
             session.userData.achievementBadge = answerResp.achievementBadge;
