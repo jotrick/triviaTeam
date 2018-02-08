@@ -1,9 +1,5 @@
 import * as request from "request";
-// import * as builder from "botbuilder";
 let http = require("http");
-// import { VSTSTokenOAuth2API } from "./VSTSTokenOAuth2API";
-// import { DialogIds } from "../utils/DialogIds";
-// import { Strings } from "../locale/locale";
 
 // Callback for HTTP requests
 export interface RequestCallback {
@@ -17,35 +13,6 @@ export class TriviaRequest {
     constructor() {
         // do nothing
     }
-
-    // private isUserValidated(session: builder.Session): boolean {
-    //     let isValidated = session.userData &&
-    //         session.userData.vstsAuth &&
-    //         session.userData.vstsAuth.isValidated;
-
-    //     if (!isValidated) {
-    //         session.send(Strings.need_to_log_in);
-    //         session.beginDialog(DialogIds.VSTSLogInDialogId);
-    //     }
-
-    //     return isValidated;
-    // }
-
-    // private async getAccessToken(session: builder.Session): Promise<any> {
-    //     if (!this.isUserValidated(session)) {
-    //         return null;
-    //     }
-
-    //     let auth = new VSTSTokenOAuth2API();
-    //     // sets tokens in session.userData.vstsAuth.token and session.userData.vstsAuth.refreshToken
-    //     await auth.refreshTokens(session);
-
-    //     session.sendTyping();
-
-    //     let args = { vsts_access_token: session.userData.vstsAuth.token };
-
-    //     return args;
-    // };
 
     // Make a GET request to API.
     // Syntax: .get(uri, [query], callback)

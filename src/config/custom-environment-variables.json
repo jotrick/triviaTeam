@@ -27,5 +27,8 @@
         "connectionString": "MONGODB_CONNECTION_STRING",
         "botStateCollection": "MONGODB_BOT_STATE_COLLECTION",
         "tempTokensCollection": "MONGODB_TEMP_TOKENS_COLLECTION"
+    },
+    "eventGrid": {
+        "key": "EVENT_GRID_KEY"
     }
 }
