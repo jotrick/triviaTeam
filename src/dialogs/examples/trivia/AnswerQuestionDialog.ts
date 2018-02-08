@@ -211,7 +211,18 @@ export class AnswerQuestionDialog extends TriggerActionDialog {
             questionId: session.message.value.questionId,
             answerId: session.message.value.id,
         };
-        return await api.postAnswer(body);
+        let answerResp = await api.postAnswer(body);
+
+        let currBadge = session.userData.achievementBadge;
+        if (currBadge !== answerResp.achievementBadge) {
+            // trigger event to Event Grid
+            api.notifyTopic({
+                userName: session.message.user.name,
+                newBadge: answerResp.achievementBadge,
+            });
+            session.userData.achievementBadge = answerResp.achievementBadge;
+        }
+        return answerResp;
     }
 
     private static createCompletedCardMessage(session: builder.Session): builder.Message {
