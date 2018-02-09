@@ -67,4 +67,14 @@ export class TriviaAPI {
         }
         return respBody;
     }
+
+    public async searchUser(name: string): Promise<any> {
+        let headers = {
+            "Accept": "application/json",
+        };
+        let url = "https://msopenhack.azurewebsites.net/api/trivia/search?k=" + name;
+        let resp = await this.requestAPI.getAsync(url, headers, "");
+        let respBody = JSON.parse(resp);
+        return respBody;
+    }
 }

@@ -4,6 +4,7 @@ import * as request from "request";
 import { loadSessionAsync } from "../utils/DialogUtils";
 import * as config from "config";
 import { Strings } from "../locale/locale";
+import { TriviaAPI } from "../apis/TriviaAPI";
 
 const searchApiUrlFormat = "https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=[keyword]&srlimit=[limit]&sroffset=[offset]&format=json";
 const imageApiUrlFormat = "https://en.wikipedia.org/w/api.php?action=query&formatversion=2&format=json&prop=pageimages&piprop=thumbnail&pithumbsize=250&titles=[title]";
@@ -13,6 +14,60 @@ export class ComposeExtensionHandlers {
     // this function returns a handler that will handle all interactions with the compose extension
     // in the compose extension search flyout
     public static getOnQueryHandler(bot: builder.UniversalBot): (event: builder.IEvent, query: teams.ComposeExtensionQuery, callback: (err: Error, result: teams.IComposeExtensionResponse, statusCode: number) => void) => void {
+        return async function (
+            event: builder.IEvent,
+            query: teams.ComposeExtensionQuery,
+            callback: (err: Error, result: teams.IComposeExtensionResponse, statusCode: number) => void,
+        ): Promise<void>
+        {
+            let manifestInitialRun = "initialRun";
+            let manifestParameterName = "query";
+            let initialRunParameter = getQueryParameterByName(query, manifestInitialRun);
+            // NOTE: make sure to not enter special characters that would break a regular expression
+            // due to the logic that is used later
+            let queryParameter = getQueryParameterByName(query, manifestParameterName);
+
+            // let session = await loadSessionAsync(bot, event);
+
+            if (initialRunParameter) {
+                let directionsResponse = teams.ComposeExtensionResponse.message()
+                    .text("Search for a person")
+                    .toResponse();
+                callback(null, directionsResponse, 200);
+                return;
+            }
+
+            let api = new TriviaAPI();
+            let resp = await api.searchUser(queryParameter);
+
+            let cardAttachments = new Array<teams.ComposeExtensionAttachment>();
+
+            for (let entry of resp) {
+                let card = new builder.ThumbnailCard();
+
+                card.title(entry.name)
+                    .text("Score: " + entry.score);
+
+                let previewCard = new builder.ThumbnailCard()
+                    .title(entry.name)
+                    .text("Score: " + entry.score);
+
+                let cardAttachment: teams.ComposeExtensionAttachment = card.toAttachment();
+                // add preview card to the response card
+                cardAttachment.preview = previewCard.toAttachment();
+
+                cardAttachments.push(cardAttachment);
+            }
+
+            let responseObject = teams.ComposeExtensionResponse.result("list");
+            let response = responseObject.attachments(cardAttachments).toResponse();
+            callback(null, response, 200);
+        };
+    }
+
+    // this function returns a handler that will handle all interactions with the compose extension
+    // in the compose extension search flyout
+    public static getOnQueryHandler2(bot: builder.UniversalBot): (event: builder.IEvent, query: teams.ComposeExtensionQuery, callback: (err: Error, result: teams.IComposeExtensionResponse, statusCode: number) => void) => void {
         return async function (
             event: builder.IEvent,
             query: teams.ComposeExtensionQuery,
